@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Feedback Generator</title>
+</head>
+<body>
+  <h2>Upload File</h2>
+  <input type="file" id="fileInput"  multiple />
+  <button onclick="submitFile()">Submit</button>
+
+  <script>
+    async function submitFile() {
+
+      // get the files associated with fileInput
+      const fileInput = document.getElementById("fileInput");
+      const files = fileInput.files;
+
+      // don't accept empty submissions
+      if (files.length === 0){
+        alert("Please select at least one file.");
+        return;
+      }
+      // report back the files being submittes
+      const fileNames = []
+      for (let i = 0; i < files.length; i++){
+        fileNames.push(files[i].name)
+      }
+
+      alert(`Selected file: ${fileNames}`);
+
+      // package the data (form names) and call the endpoint 
+      const feedBackLetterFiles = new FormData();
+      for (let i = 0; i < files.length; i++){
+        feedBackLetterFiles.append("files", files[i])
+      }
+
+      try{
+        const response = await fetch('http://localhost:5000/upload', {
+          method:'POST',
+          body: feedBackLetterFiles
+        })
+        if (!response.ok){
+          throw new Error('HTTP error! Status: ${response.status}');
+        }
+      } catch (err){
+        console.error("Something went wrong: ${err}")
+        alert("Upload failed. See console for details")
+      }
+    }
+  </script>
+</body>
+</html>
